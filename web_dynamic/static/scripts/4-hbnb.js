@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  placeSearch({});
   let amenitiesObj = {};
   $(".amenities input").click(function (event) {
     let amenity = $(event.target);
@@ -22,16 +23,21 @@ $(document).ready(function () {
       }
     }
   });
-  $.ajax({
-    type: "POST",
-    url: "http://0.0.0.0:5001/api/v1/places_search/",
-    contentType: "application/json",
-    data: JSON.stringify({}),
-    success: function (response) {
-      console.log(response);
-      let article = "";
-      response.forEach(function (place) {
-        article = `<article>
+  $("#search_btn").click(function () {
+    placeSearch({ amenities: Object.keys(amenitiesObj) });
+  });
+  function placeSearch(filter) {
+    $(".places").empty();
+    $.ajax({
+      type: "POST",
+      url: "http://localhost:5001/api/v1/places_search/",
+      contentType: "application/json",
+      data: JSON.stringify(filter),
+      success: function (response) {
+        console.log(response);
+        let article = "";
+        response.forEach(function (place) {
+          article = `<article>
           <div class="title_box">
             <h2>${place.name}</h2>
             <div class="price_by_night">${place.price_by_night}</div>
@@ -45,13 +51,14 @@ $(document).ready(function () {
             </div>
             <div class="number_bathrooms">
               ${place.number_bathrooms} Bathroom${
-          place.number_bathrooms != 1 ? "s" : ""
-        }
+            place.number_bathrooms != 1 ? "s" : ""
+          }
             </div>
           </div>
         </article>`;
-        $(".places").append(article);
-      });
-    },
-  });
+          $(".places").append(article);
+        });
+      },
+    });
+  }
 });
